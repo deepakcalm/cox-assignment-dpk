@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "pw-customer": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@0.0.41", "--isolated", "--browser", "chromium"]
+    },
+    "pw-agent": {
+      "command": "npx",
+      "args": [
+        "-y", "@playwright/mcp@0.0.41", "--isolated", "--browser", "chromium",
+        "--storage-state", "e2e-cobrowse/.auth/agent.json"
+      ]
+    }
+  }
+}

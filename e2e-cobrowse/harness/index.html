@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>CoBrowse Harness</title>
+  <!-- Glance Cobrowse loader. group/site come from env via server.mjs -->
+  <script id="glance-cobrowse" type="text/javascript"
+          src="https://www.glancecdn.net/cobrowse/CobrowseJS.ashx?group=__GLANCE_GROUP_ID__&site=__GLANCE_SITE__"
+          data-groupid="__GLANCE_GROUP_ID__" data-site="__GLANCE_SITE__" charset="UTF-8"></script>
+</head>
+<body>
+  <h1>Mock Online Banking</h1>
+  <!-- Agent-visible marker: the test asserts the agent sees this text -->
+  <p data-testid="marker">Welcome, <span id="run-marker"></span></p>
+
+  <!-- PII: must be masked for the agent. Also add these selectors to the
+       masking rules in Glance admin; attribute below is the in-page hint. -->
+  <form>
+    <label>Account number <input id="acct" class="glance_masked" glance_masked="true" /></label>
+    <label>SSN <input id="ssn" class="glance_masked" glance_masked="true" /></label>
+    <div id="balance" class="glance_masked" glance_masked="true">$12,345.67</div>
+  </form>
+
+  <footer>
+    <button id="cobrowse-btn" type="button">CoBrowse</button>
+    <div>Session code: <span data-testid="session-key" id="session-key"></span></div>
+  </footer>
+
+  <script>
+    document.getElementById('run-marker').textContent =
+      new URLSearchParams(location.search).get('marker') || 'NO-MARKER';
+
+    document.getElementById('cobrowse-btn').addEventListener('click', function () {
+      var V = window.GLANCE && GLANCE.Cobrowse && GLANCE.Cobrowse.Visitor;
+      if (!V) { document.getElementById('session-key').textContent = 'GLANCE-NOT-LOADED'; return; }
+      V.addEventListener('sessionstart', function () {
+        // Expose the key in our own DOM so the test does not depend on Glance's UI markup
+        var key = (V.getSessionKey && V.getSessionKey()) || '';
+        document.getElementById('session-key').textContent = key;
+      });
+      V.startSession();
+    });
+  </script>
+</body>
+</html>
